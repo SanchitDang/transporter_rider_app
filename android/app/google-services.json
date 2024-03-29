@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "828241845214",
+    "project_id": "transporter-3634f",
+    "storage_bucket": "transporter-3634f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:828241845214:android:bd91d448b4576908be9b4f",
+        "android_client_info": {
+          "package_name": "com.transporter.driver.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDuSGG9N4fWaf3lG9fXV-4-e-DTjwOZqNI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:828241845214:android:0db99cce44b586cabe9b4f",
+        "android_client_info": {
+          "package_name": "com.transporter.user.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDuSGG9N4fWaf3lG9fXV-4-e-DTjwOZqNI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
