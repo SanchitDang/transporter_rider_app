@@ -1,7 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:get/get.dart';
 import 'package:transporter_rider_app/features/uber_map_feature/presentation/getx/uber_map_controller.dart';
+
+import '../../services/firestore_service.dart';
+import '../getx/trip_controller.dart';
 
 class DriverDetails extends StatelessWidget {
   final UberMapController uberMapController;
@@ -65,6 +69,27 @@ class DriverDetails extends StatelessWidget {
                     backgroundColor: Colors.green,
                     foregroundColor: Colors.white,
                     child: Icon(Icons.call),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () async {
+                    final FirestoreService firestoreService = FirestoreService();
+                    TripController tc = Get.put(TripController());
+                    final String tripId = tc.getCurrentTripId();
+
+                    try {
+                      await firestoreService.openImagePickerBottomSheet(context, tripId);
+                      print('Image picked and uploaded successfully!');
+                    } catch (e) {
+                      print('Failed to pick and upload image: $e');
+                    }
+
+                  },
+                  child: const CircleAvatar(
+                    radius: 25,
+                    backgroundColor: Colors.pinkAccent,
+                    foregroundColor: Colors.white,
+                    child: Icon(Icons.add_photo_alternate_outlined),
                   ),
                 )
               ],

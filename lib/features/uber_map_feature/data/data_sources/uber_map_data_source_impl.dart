@@ -15,6 +15,7 @@ import 'package:transporter_rider_app/features/uber_map_feature/data/models/uber
 import 'package:transporter_rider_app/features/uber_map_feature/data/models/uber_map_drivers_model.dart';
 import 'package:transporter_rider_app/features/uber_map_feature/data/models/uber_map_prediction_model.dart';
 import 'package:transporter_rider_app/features/uber_map_feature/data/models/vehicle_details_model.dart';
+import 'package:transporter_rider_app/features/uber_map_feature/presentation/getx/trip_controller.dart';
 
 class UberMapDataSourceImpl extends UberMapDataSource {
   final http.Client client;
@@ -97,6 +98,8 @@ class UberMapDataSourceImpl extends UberMapDataSource {
 
   @override
   Stream generateTrip(GenerateTripModel generateTripModel) {
+    TripController tc = Get.put(TripController());
+    tc.setCurrentTripId(generateTripModel.tripId ?? "");
 
     final genarateTripCollection = firestore.collection("trips");
     genarateTripCollection.doc(generateTripModel.tripId).set({
@@ -142,13 +145,6 @@ class UberMapDataSourceImpl extends UberMapDataSource {
       );
 
     });
-
-    // todo when driver is accept payment button on driver app is clicked
-    // then show dialog box
-    // if out_for_delivery == true
-    //      destination_location GMAPS
-    // else
-    //      warehouse_source_location GMAPS
 
     return genarateTripCollection.doc(generateTripModel.tripId).snapshots();
   }
