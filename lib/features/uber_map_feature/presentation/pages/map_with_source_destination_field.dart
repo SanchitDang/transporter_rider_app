@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -9,6 +10,12 @@ import 'package:transporter_rider_app/features/uber_home_page_feature/presentati
 import 'package:transporter_rider_app/features/uber_map_feature/presentation/getx/uber_map_controller.dart';
 import 'package:transporter_rider_app/features/uber_map_feature/presentation/widgets/map_confirmation_bottomsheet.dart';
 import 'package:transporter_rider_app/injection_container.dart' as di;
+
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+import '../../../../config/maps_api_key.dart';
+import '../widgets/WarehouseDialog.dart';
 
 class MapWithSourceDestinationField extends StatefulWidget {
   final CameraPosition defaultCameraPosition;
@@ -241,6 +248,52 @@ class _MapWithSourceDestinationFieldState
                       ),
                     ),
                   ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        style: ButtonStyle(
+                            backgroundColor:
+                            MaterialStateProperty.all(Colors.pink),
+                            elevation: MaterialStateProperty.all(0.0),
+                            padding:
+                            MaterialStateProperty.all(const EdgeInsets.all(15))),
+                        onPressed: () async {
+                          _uberMapController.generateCustomTrip();
+
+
+
+                          final scaffoldMessenger = ScaffoldMessenger.of(context);
+                          scaffoldMessenger.showSnackBar(
+                            const SnackBar(
+                              content: Text("Placed Successful"),
+                            ),
+                          );
+
+                          // todo :: show dialog to where to drop at where house
+                          //todo, add from admin panel
+                          List<Map<String, dynamic>> places = [
+                            {'name': "XYZ WareHouse", 'latitude': 28.63873688409748, 'longitude': 77.11972520423109},
+                            {'name': "PQR WareHouse", 'latitude': 28.64476311801263, 'longitude': 77.1268920666985},
+                          ];
+
+                          //find nearest warehouse enar source location so that driver can drop there
+                          findNearestPlace(places);
+
+                        },
+                        child: const Text(
+                          "Drop on your Own",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
                 ],
               ),
               Visibility(
@@ -271,4 +324,51 @@ class _MapWithSourceDestinationFieldState
       ),
     );
   }
+
+  Future<Map<String, dynamic>> findNearestPlace(List<Map<String, dynamic>> places) async {
+
+    double minDistance = double.infinity;
+    Map<String, dynamic>? nearestPlace; // Nullable
+
+    // Loop through places and calculate distances
+    for (var place in places) {
+      double lat = place['latitude']!;
+      double lon = place['longitude']!;
+      String url =
+          'https://maps.googleapis.com/maps/api/directions/json?origin=${_uberMapController.sourceLatitude.value},${_uberMapController.sourceLongitude.value}&destination=$lat,$lon&key=$apiKey';
+      http.Response response = await http.get(Uri.parse(url));
+      Map<String, dynamic> data = json.decode(response.body);
+      if (data['status'] == 'OK') {
+        double distance =
+            data['routes'][0]['legs'][0]['distance']['value'] / 1000.0; // Distance in kilometers
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestPlace = {
+            'name': place['name'],
+            'latitude': lat,
+            'longitude': lon,
+            'distance': distance,
+            'time': data['routes'][0]['legs'][0]['duration']['text']
+          };
+          print('Nearest Place ---->');
+          print(nearestPlace);
+
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return WarehouseDialog(
+                latitude: lat,
+                longitude: lon, // Example longitude
+              );
+            },
+          );
+
+        }
+      }
+    }
+
+    return nearestPlace ?? {}; // Return an empty map if no nearest place found
+  }
+
+
 }

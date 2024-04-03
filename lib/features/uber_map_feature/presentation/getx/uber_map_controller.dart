@@ -384,4 +384,35 @@ class UberMapController extends GetxController {
       });
     });
   }
+
+  generateCustomTrip() async {
+    uberCancelTripUseCase.call(prevTripId.value, true); // if canceled
+    subscription.pause();
+
+    String riderId = await uberAuthGetUserUidUseCase.call();
+
+    DocumentReference riderIdRef =
+        FirebaseFirestore.instance.doc("/riders/$riderId");
+    var tripId = const Uuid().v4();
+    prevTripId.value = tripId;
+    final generateTripModel = GenerateTripModel(
+        sourcePlaceName.value,
+        destinationPlaceName.value,
+        GeoPoint(sourceLatitude.value, sourceLongitude.value),
+        GeoPoint(destinationLatitude.value, destinationLongitude.value),
+        uberMapDirectionData[0].distanceValue! / 1000.roundToDouble(),
+        uberMapDirectionData[0].durationText,
+        true,
+        DateTime.now().toString(),
+        null,
+        riderIdRef,
+        0.0,
+        true,
+        000000, // todo put trip amount
+        true,
+        false,
+        tripId);
+    Stream reqStatusData = uberMapGenerateTripUseCase.call(generateTripModel);
+    findDriverLoading.value = true;
+  }
 }
