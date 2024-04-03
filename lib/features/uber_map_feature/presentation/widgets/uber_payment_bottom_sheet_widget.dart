@@ -41,14 +41,14 @@ class _UberPaymentBottomSheetState extends State<UberPaymentBottomSheet> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(
-                height: 25,
+                height: 18,
               ),
               const Text(
                 "Trip Completed",
                 style: TextStyle(fontWeight: FontWeight.w800, fontSize: 35),
               ),
               const SizedBox(
-                height: 25,
+                height: 10,
               ),
               ElevatedButton(
                 style: ButtonStyle(
@@ -93,14 +93,14 @@ class _UberPaymentBottomSheetState extends State<UberPaymentBottomSheet> {
                 ),
               ),
               const SizedBox(
-                height: 25,
+                height: 10,
               ),
               const Text(
                 "OR",
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
               ),
               const SizedBox(
-                height: 25,
+                height: 10,
               ),
               ElevatedButton(
                 style: ButtonStyle(
@@ -121,7 +121,37 @@ class _UberPaymentBottomSheetState extends State<UberPaymentBottomSheet> {
                   "Pay \u{20B9}${widget.tripHistoryEntity.tripAmount} cash",
                   style: const TextStyle(fontSize: 18),
                 ),
-              )
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              const Text(
+                "OR",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              ElevatedButton(
+                style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all(Colors.pink),
+                    elevation: MaterialStateProperty.all(0.0),
+                    padding:
+                        MaterialStateProperty.all(const EdgeInsets.all(15))),
+                onPressed: () async {
+                  await _uberLiveTrackingController.makePayment("", "", 0,
+                      widget.tripHistoryEntity.tripId.toString(), "cod");
+                  Get.off(() => const UberHomePage());
+                  //Get.back();
+                  showRatingAppDialog(context, widget.tripHistoryEntity,
+                      _uberTripsHistoryController);
+                },
+                child: Text(
+                  "Cash On Delivery \u{20B9}${widget.tripHistoryEntity.tripAmount}",
+                  style: const TextStyle(fontSize: 18),
+                ),
+              ),
             ],
           ),
         ),

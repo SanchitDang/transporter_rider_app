@@ -27,9 +27,9 @@ class UberMapDataSourceImpl extends UberMapDataSource {
       {required this.auth, required this.firestore, required this.client});
 
   //todo, add from admin panel
-  List<Map<String, double>> places = [
-    {'name': 101, 'latitude': 28.63873688409748, 'longitude': 77.11972520423109},
-    {'name': 102, 'latitude': 28.64476311801263, 'longitude': 77.1268920666985},
+  List<Map<String, dynamic>> places = [
+    {'name': "XYZ WareHouse", 'latitude': 28.63873688409748, 'longitude': 77.11972520423109},
+    {'name': "PQR WareHouse", 'latitude': 28.64476311801263, 'longitude': 77.1268920666985},
   ];
 
   @override
@@ -129,6 +129,7 @@ class UberMapDataSourceImpl extends UberMapDataSource {
       'out_for_delivery': false,
       'delivered': false,
       'is_from_admin': false,
+      'is_cod': false,
     });
 
     //find nearest warehouse enar source location so that driver can drop there
@@ -212,18 +213,35 @@ class UberMapDataSourceImpl extends UberMapDataSource {
           });
         }
       });
-    } else {
+    } else if (payMode == "cash") {
       await firestore
           .collection("trips")
           .doc(tripId)
           .update({'is_payment_done': true}).whenComplete(() {
         res.value = "done";
       });
+    } else {
+      // ie payMode == "cod"
+      await firestore
+          .collection("trips")
+          .doc(tripId)
+          .update({'is_cod': true}).whenComplete(() {
+        res.value = "done";
+      });
+      await firestore
+          .collection("trips")
+          .doc(tripId)
+          .update({'is_payment_done': true}).whenComplete(() {
+        res.value = "done";
+      });
+      // <---- IMP ---->
+      // is_payment_done is true ie first half flow is completed..
+      // is_cod is true ie driver have to get payment from second user
     }
     return Future.value(res.value);
   }
 
-  Future<Map<String, dynamic>> findNearestPlace(GenerateTripModel generateTripModel, List<Map<String, double>> places) async {
+  Future<Map<String, dynamic>> findNearestPlace(GenerateTripModel generateTripModel, List<Map<String, dynamic>> places) async {
 
     double minDistance = double.infinity;
     Map<String, dynamic>? nearestPlace; // Nullable
