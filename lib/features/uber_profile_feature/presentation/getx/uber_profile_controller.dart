@@ -53,6 +53,7 @@ class UberProfileController extends GetxController {
 
   updateRiderProfile(String name, String email, String city, String homeAddress,
       String workAddress) async {
+    String riderId = await uberAuthGetUserUidUseCase.call();
     final riderEntity = RiderEntity(
         name,
         email,
@@ -61,8 +62,8 @@ class UberProfileController extends GetxController {
         riderData['profileUrl'],
         homeAddress,
         workAddress,
-        riderData.value['wallet']);
-    String riderId = await uberAuthGetUserUidUseCase.call();
+        riderData.value['wallet'],
+        riderId);
     await uberProfileUpdateRiderUsecase.call(riderEntity, riderId);
     Get.snackbar("Done.", "Profile Updated!",
         snackPosition: SnackPosition.BOTTOM);

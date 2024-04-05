@@ -75,6 +75,8 @@ class UberAuthController extends GetxController {
 
   addRiderprofile(String name, String email, String city, String homeAddress,
       String workAddress) async {
+    final String riderId = await uberAuthGetUserUidUseCase.call();
+
     final riderEntity = RiderEntity(
         name,
         email,
@@ -83,7 +85,8 @@ class UberAuthController extends GetxController {
         profileImgUrl.value,
         homeAddress,
         workAddress,
-        0);
+        0,
+        riderId);
     await uberAuthGetUserUidUseCase.call().then((riderId) async {
       await uberProfileUpdateRiderUsecase.call(riderEntity, riderId);
       Get.snackbar("uploading details!", "Please wait !",
