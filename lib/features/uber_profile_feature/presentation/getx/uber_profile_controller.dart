@@ -62,8 +62,7 @@ class UberProfileController extends GetxController {
         riderData['profileUrl'],
         homeAddress,
         workAddress,
-        riderData.value['wallet'],
-        riderId);
+        riderData.value['wallet'],);
     await uberProfileUpdateRiderUsecase.call(riderEntity, riderId);
     Get.snackbar("Done.", "Profile Updated!",
         snackPosition: SnackPosition.BOTTOM);

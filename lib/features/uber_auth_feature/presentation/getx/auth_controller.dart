@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:transporter_rider_app/features/uber_auth_feature/domain/use_cases/uber_add_profile_image_usecase.dart';
@@ -75,7 +76,6 @@ class UberAuthController extends GetxController {
 
   addRiderprofile(String name, String email, String city, String homeAddress,
       String workAddress) async {
-    final String riderId = await uberAuthGetUserUidUseCase.call();
 
     final riderEntity = RiderEntity(
         name,
@@ -85,8 +85,7 @@ class UberAuthController extends GetxController {
         profileImgUrl.value,
         homeAddress,
         workAddress,
-        0,
-        riderId);
+        0);
     await uberAuthGetUserUidUseCase.call().then((riderId) async {
       await uberProfileUpdateRiderUsecase.call(riderEntity, riderId);
       Get.snackbar("uploading details!", "Please wait !",
@@ -94,9 +93,25 @@ class UberAuthController extends GetxController {
     });
     final userStatus = await checkUserStatus();
     if (userStatus) {
+      // adding the created document id to rider_id as field
+      await updateRiderId(FirebaseAuth.instance.currentUser!.uid );
+      // go to homepage
       Get.closeAllSnackbars();
       Get.snackbar("done", "registration successful!");
       Get.offAll(() => const UberHomePage());
+    }
+  }
+
+  Future<void> updateRiderId(String riderId) async {
+    final CollectionReference driversCollection = FirebaseFirestore.instance.collection('riders');
+    try {
+      await driversCollection.doc(riderId).update({
+        'rider_id': riderId,
+      });
+      print('Rider ID updated successfully');
+    } catch (error) {
+      print('Error updating rider ID: $error');
+      // Handle error
     }
   }
 }

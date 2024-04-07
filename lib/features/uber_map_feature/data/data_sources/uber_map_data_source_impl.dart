@@ -3,9 +3,7 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:http/http.dart' as http;
 import 'package:transporter_rider_app/config/maps_api_key.dart';
 import 'package:transporter_rider_app/features/uber_map_feature/data/data_sources/uber_map_data_source.dart';
@@ -120,8 +118,8 @@ class UberMapDataSourceImpl extends UberMapDataSource {
       'trip_amount': generateTripModel.tripAmount,
       'is_arrived': generateTripModel.isArrived,
       'is_payment_done': generateTripModel.isPaymentDone,
-      //for our flow
-      'warehouse_source_location': GeoPoint(0.0, 0.0),
+      //for our flow / our fields
+      'warehouse_source_location': const GeoPoint(0.0, 0.0),
       'sending_warehouse_source': false,
       'reached_warehouse_source': false,
       'sending_warehouse_destination': false,

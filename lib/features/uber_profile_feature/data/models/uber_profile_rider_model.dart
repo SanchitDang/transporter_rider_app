@@ -12,10 +12,9 @@ class RiderModel extends RiderEntity {
       String? homeAddress,
       String? workAddress,
       int? wallet,
-      String? riderId
       })
       : super(name, email, phoneNumber, city, profileUrl, homeAddress,
-            workAddress, wallet, riderId);
+            workAddress, wallet);
 
   Map<String, dynamic> toDocument() {
     return {
@@ -27,7 +26,6 @@ class RiderModel extends RiderEntity {
       "home_address": homeAddress,
       "work_address": workAddress,
       "wallet": wallet,
-      "rider_id": riderId,
     };
   }
 
@@ -40,7 +38,6 @@ class RiderModel extends RiderEntity {
         workAddress: documentSnapshot.get('work_address'),
         homeAddress: documentSnapshot.get('home_address'),
         profileUrl: documentSnapshot.get('profile_img'),
-        wallet: documentSnapshot.get('wallet'),
-        riderId: documentSnapshot.get('rider_id'));
+        wallet: documentSnapshot.get('wallet'),);
   }
 }
