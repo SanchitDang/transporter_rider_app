@@ -3,7 +3,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 UberHomeWhereToWidget() {
   return Container(
-    margin: const EdgeInsets.all(15),
     padding: const EdgeInsets.all(18),
     decoration: BoxDecoration(
         borderRadius: const BorderRadius.all(Radius.circular(12)),

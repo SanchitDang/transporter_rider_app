@@ -7,6 +7,8 @@ import 'package:get/get_utils/get_utils.dart';
 import 'package:transporter_rider_app/features/uber_auth_feature/presentation/getx/auth_controller.dart';
 import 'package:transporter_rider_app/features/uber_auth_feature/presentation/widgets/uber_auth_register_textfield_widget.dart';
 
+import '../../../../config/constants.dart';
+
 class UberAuthRegistrationPage extends StatefulWidget {
   const UberAuthRegistrationPage({Key? key}) : super(key: key);
 
@@ -106,7 +108,7 @@ class _UberAuthRegistrationPageState extends State<UberAuthRegistrationPage> {
                       foregroundColor:
                           MaterialStateProperty.all<Color>(Colors.white),
                       backgroundColor:
-                          MaterialStateProperty.all<Color>(Colors.black),
+                          MaterialStateProperty.all<Color>(primaryColor),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24.0),

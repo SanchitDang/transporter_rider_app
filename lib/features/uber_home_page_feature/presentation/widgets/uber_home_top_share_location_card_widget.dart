@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:transporter_rider_app/features/uber_home_page_feature/presentation/getx/uber_home_controller.dart';
 
+import '../../../../config/constants.dart';
+
 uberHomeTopShareLocationCardWidget(UberHomeController uberHomeController) {
   return Container(
     padding: const EdgeInsets.all(22),
-    decoration: const BoxDecoration(
-        color: Colors.teal,
-        borderRadius: BorderRadius.all(Radius.circular(15))),
+    decoration: BoxDecoration(
+        color: primaryColor,
+        borderRadius: const BorderRadius.all(Radius.circular(15))),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -22,7 +24,7 @@ uberHomeTopShareLocationCardWidget(UberHomeController uberHomeController) {
                   color: Colors.white),
             ),
             const Text(
-              "Pick-Ups ?",
+              "Transport-Service ?",
               style: TextStyle(
                   fontWeight: FontWeight.w500,
                   fontSize: 18,
@@ -31,17 +33,19 @@ uberHomeTopShareLocationCardWidget(UberHomeController uberHomeController) {
             const SizedBox(
               height: 10,
             ),
-            GestureDetector(
-              onTap: () {
-                uberHomeController.getUserCurrentLocation();
-              },
-              child: Row(
+            // GestureDetector(
+            //   onTap: () {
+                // // get current location
+                //  uberHomeController.getUserCurrentLocation();
+              // },
+              // child:
+              Row(
                 children: const [
                   Text(
-                    "Share location  ",
+                    "Book Service    ",
                     style: TextStyle(
                         fontWeight: FontWeight.w400,
-                        fontSize: 15,
+                        fontSize: 16,
                         color: Colors.white),
                   ),
                   FaIcon(
@@ -50,12 +54,12 @@ uberHomeTopShareLocationCardWidget(UberHomeController uberHomeController) {
                   )
                 ],
               ),
-            ),
+            // ),
           ],
         ),
-        FaIcon(
+        const FaIcon(
           FontAwesomeIcons.binoculars,
-          color: Colors.tealAccent.withOpacity(0.2),
+          color: Color.fromRGBO(214, 84, 48, 0.85),
           size: 75,
         ),
       ],

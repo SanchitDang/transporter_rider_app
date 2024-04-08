@@ -6,6 +6,8 @@ import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:transporter_rider_app/config/constants.dart';
+import 'package:transporter_rider_app/features/uber_home_page_feature/presentation/getx/uber_home_controller.dart';
 import 'package:transporter_rider_app/features/uber_home_page_feature/presentation/pages/uber_home_page.dart';
 import 'package:transporter_rider_app/features/uber_map_feature/presentation/getx/uber_map_controller.dart';
 import 'package:transporter_rider_app/features/uber_map_feature/presentation/widgets/map_confirmation_bottomsheet.dart';
@@ -251,46 +253,52 @@ class _MapWithSourceDestinationFieldState
                   const SizedBox(
                     height: 10,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                        style: ButtonStyle(
-                            backgroundColor:
-                            MaterialStateProperty.all(Colors.pink),
-                            elevation: MaterialStateProperty.all(0.0),
-                            padding:
-                            MaterialStateProperty.all(const EdgeInsets.all(15))),
-                        onPressed: () async {
-                          _uberMapController.generateCustomTrip();
+                  Obx(()=> Visibility(
+                    visible: _uberMapController.uberMapDirectionData.value.length == 0 || _uberMapController.uberMapDirectionData.value[0].durationValue == 0,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
 
+                          style: ButtonStyle(
+                              backgroundColor:
+                              MaterialStateProperty.all(primaryColor),
+                              elevation: MaterialStateProperty.all(0.0),
+                              padding:
+                              MaterialStateProperty.all(const EdgeInsets.all(14)),
+                              shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0), // Adjust the value as needed
+                              ),)
+                          ),
+                          onPressed: () async {
+                            _uberMapController.generateCustomTrip();
 
+                            final scaffoldMessenger = ScaffoldMessenger.of(context);
+                            scaffoldMessenger.showSnackBar(
+                              const SnackBar(
+                                content: Text("Placed Successful"),
+                              ),
+                            );
 
-                          final scaffoldMessenger = ScaffoldMessenger.of(context);
-                          scaffoldMessenger.showSnackBar(
-                            const SnackBar(
-                              content: Text("Placed Successful"),
-                            ),
-                          );
+                            //todo, add from admin panel
+                            List<Map<String, dynamic>> places = [
+                              {'name': "XYZ WareHouse", 'latitude': 28.63873688409748, 'longitude': 77.11972520423109},
+                              {'name': "PQR WareHouse", 'latitude': 28.64476311801263, 'longitude': 77.1268920666985},
+                            ];
 
-                          // todo :: show dialog to where to drop at where house
-                          //todo, add from admin panel
-                          List<Map<String, dynamic>> places = [
-                            {'name': "XYZ WareHouse", 'latitude': 28.63873688409748, 'longitude': 77.11972520423109},
-                            {'name': "PQR WareHouse", 'latitude': 28.64476311801263, 'longitude': 77.1268920666985},
-                          ];
+                            //find nearest warehouse enar source location so that driver can drop there
+                            findNearestPlace(places);
 
-                          //find nearest warehouse enar source location so that driver can drop there
-                          findNearestPlace(places);
-
-                        },
-                        child: const Text(
-                          "Drop on your Own",
-                          style: TextStyle(fontSize: 18),
+                          },
+                          child: const Text(
+                            "Drop on your Own",
+                            style: TextStyle(fontSize: 18),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  )),
                   const SizedBox(
                     height: 10,
                   ),
@@ -369,6 +377,5 @@ class _MapWithSourceDestinationFieldState
 
     return nearestPlace ?? {}; // Return an empty map if no nearest place found
   }
-
 
 }

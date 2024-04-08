@@ -5,6 +5,8 @@ import 'package:transporter_rider_app/features/uber_auth_feature/presentation/ge
 import 'package:transporter_rider_app/features/uber_auth_feature/presentation/widgets/uber_auth_otp_page_top_body_widget.dart';
 import 'package:transporter_rider_app/features/uber_auth_feature/presentation/widgets/uber_auth_textfield_widget.dart';
 
+import '../../../../config/constants.dart';
+
 class OtpVerificationPage extends StatefulWidget {
   const OtpVerificationPage({Key? key}) : super(key: key);
 
@@ -96,7 +98,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                           foregroundColor:
                               MaterialStateProperty.all<Color>(Colors.white),
                           backgroundColor:
-                              MaterialStateProperty.all<Color>(Colors.black),
+                              MaterialStateProperty.all<Color>(primaryColor),
                           shape:
                               MaterialStateProperty.all<RoundedRectangleBorder>(
                             RoundedRectangleBorder(
