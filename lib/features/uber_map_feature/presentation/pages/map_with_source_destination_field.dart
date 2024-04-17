@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
@@ -114,6 +115,35 @@ class _MapWithSourceDestinationFieldState
                           height: 250, child: MapConfirmationBottomSheet()),
                     )
                   ],
+                ),
+              ),
+              Positioned(
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Align(
+                    alignment: Alignment.bottomRight,
+                    child: FunctionalButton(
+                        title: '',
+                        icon: Icons.my_location,
+                        onPressed: () async {
+                          await Geolocator.getCurrentPosition(
+                              desiredAccuracy: LocationAccuracy.high)
+                              .then((Position position) async {
+                            //   location_controller.changePosition(position, controller, context);
+                            GoogleMapController controller = await _uberMapController.controller.future;
+                            controller.animateCamera(
+                              CameraUpdate.newCameraPosition(
+                                CameraPosition(
+                                  target: LatLng(position.latitude, position.longitude),
+                                  zoom: 18.0,
+                                ),
+                              ),
+                            );
+                          }).catchError((e) {
+                            print(e);
+                          });
+                        }),
+                  ),
                 ),
               ),
               Column(
@@ -376,6 +406,42 @@ class _MapWithSourceDestinationFieldState
     }
 
     return nearestPlace ?? {}; // Return an empty map if no nearest place found
+  }
+
+}
+
+
+class FunctionalButton extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final Function() onPressed;
+
+  FunctionalButton({ required this.title, required this.icon, required this.onPressed})
+      : super();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        RawMaterialButton(
+          onPressed: onPressed,
+          splashColor: Colors.black,
+          fillColor: Colors.white,
+          elevation: 15.0,
+          shape: CircleBorder(),
+          child: Padding(
+              padding: EdgeInsets.all(14.0),
+              child: Icon(
+                icon,
+                size: 30.0,
+                color: Colors.black,
+              )),
+        ),
+      ],
+    );
   }
 
 }

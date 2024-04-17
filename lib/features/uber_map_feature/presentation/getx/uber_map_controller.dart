@@ -140,7 +140,6 @@ class UberMapController extends GetxController {
     }
   }
 
-  //todo without gui admin panel ride booking ---> step 1
   getDirection() async {
     availableDriversList.clear();
     final directionData = await uberMapDirectionUsecase.call(

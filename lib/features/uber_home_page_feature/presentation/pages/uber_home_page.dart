@@ -58,7 +58,7 @@ class _UberHomePageState extends State<UberHomePage> {
                 child: uberHomeTopShareLocationCardWidget(_uberHomeController),
               ),
               const SizedBox(height: 15),
-              //todo:: uncomment to get back ride, rentals intercity options
+              // uncomment to get back ride, rentals intercity options
               // GestureDetector(
               //   onTap: () {
               //     Get.to(() => const MapWithSourceDestinationField(

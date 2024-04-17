@@ -33,7 +33,6 @@ class _UberMapLiveTrackingPageState extends State<UberMapLiveTrackingPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _uberLiveTrackingController.getDirectionData(widget.index);
   }
