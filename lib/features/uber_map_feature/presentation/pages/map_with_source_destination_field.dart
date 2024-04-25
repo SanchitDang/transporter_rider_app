@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
@@ -18,6 +19,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../../../../config/maps_api_key.dart';
+import '../../../uber_profile_feature/presentation/getx/uber_profile_controller.dart';
 import '../widgets/WarehouseDialog.dart';
 
 class MapWithSourceDestinationField extends StatefulWidget {
@@ -38,12 +40,20 @@ class MapWithSourceDestinationField extends StatefulWidget {
 class _MapWithSourceDestinationFieldState
     extends State<MapWithSourceDestinationField> {
   //final Completer<GoogleMapController> _controller = Completer();
+  final UberProfileController _uberProfileController =
+  Get.put(di.sl<UberProfileController>());
 
   final sourcePlaceController = TextEditingController();
   final destinationController = TextEditingController();
 
   final UberMapController _uberMapController =
       Get.put(di.sl<UberMapController>());
+
+  @override
+  void initState() {
+    super.initState();
+    _uberProfileController.getRiderProfile();
+  }
 
   @override
   void dispose() {
@@ -311,14 +321,30 @@ class _MapWithSourceDestinationFieldState
                               ),
                             );
 
-                            //todo, add from admin panel
-                            List<Map<String, dynamic>> places = [
-                              {'name': "XYZ WareHouse", 'latitude': 28.63873688409748, 'longitude': 77.11972520423109},
-                              {'name': "PQR WareHouse", 'latitude': 28.64476311801263, 'longitude': 77.1268920666985},
-                            ];
+                            String state = _uberProfileController
+                                .riderData
+                                .value['city']
+                                .toString().capitalizeFirst!;
 
-                            //find nearest warehouse enar source location so that driver can drop there
-                            findNearestPlace(places);
+                            try {
+                              List<Map<String, dynamic>> warehouses = await getWarehousesForState(state);
+                              warehouses.forEach((warehouse) {
+                                print("nearby warehouses in $state ------------->");
+                                print('Name: ${warehouse['name']}, Latitude: ${warehouse['latitude']}, Longitude: ${warehouse['longitude']}');
+                              });
+                              findNearestPlace(warehouses);
+                            } catch (e) {
+                              print('Failed to fetch warehouses: $e');
+                            }
+
+                            // //todo, add from admin panel (done --> above <---)
+                            // List<Map<String, dynamic>> places = [
+                            //   {'name': "XYZ WareHouse", 'latitude': 28.63873688409748, 'longitude': 77.11972520423109},
+                            //   {'name': "PQR WareHouse", 'latitude': 28.64476311801263, 'longitude': 77.1268920666985},
+                            // ];
+                            //
+                            // //find nearest warehouse enar source location so that driver can drop there
+                            // findNearestPlace(places);
 
                           },
                           child: const Text(
@@ -361,6 +387,27 @@ class _MapWithSourceDestinationFieldState
         ),
       ),
     );
+  }
+
+  final CollectionReference _warehousesCollection =
+  FirebaseFirestore.instance.collection('warehouses');
+
+  Future<List<Map<String, dynamic>>> getWarehousesForState(String state) async {
+    QuerySnapshot warehouseSnapshot = await _warehousesCollection
+        .doc('state')
+        .collection(state)
+        .get();
+
+    List<Map<String, dynamic>> places = [];
+    warehouseSnapshot.docs.forEach((doc) {
+      places.add({
+        'name': doc['name'],
+        'latitude': doc['lat'],
+        'longitude': doc['lng'],
+      });
+    });
+
+    return places;
   }
 
   Future<Map<String, dynamic>> findNearestPlace(List<Map<String, dynamic>> places) async {

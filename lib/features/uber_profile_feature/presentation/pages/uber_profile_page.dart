@@ -22,7 +22,6 @@ class _UberProfilePageState extends State<UberProfilePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _uberProfileController.getRiderProfile();
   }

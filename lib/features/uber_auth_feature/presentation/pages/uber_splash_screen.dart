@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:transporter_rider_app/config/constants.dart';
 import 'package:transporter_rider_app/core/network_checker/uber_network_checker_controller.dart';
 import 'package:transporter_rider_app/features/uber_auth_feature/presentation/getx/auth_controller.dart';
 import 'package:transporter_rider_app/features/uber_auth_feature/presentation/pages/uber_auth_register_page.dart';
@@ -45,9 +46,9 @@ class _UberSplashScreenState extends State<UberSplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.black,
-      body: Center(
+    return Scaffold(
+      backgroundColor: primaryColor,
+      body: const Center(
           child: Text(
         "Transporter",
         style: TextStyle(

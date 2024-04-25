@@ -174,7 +174,7 @@ class _UberProfileEditPageState extends State<UberProfileEditPage> {
                                 height: 15,
                               ),
                               const Text(
-                                "City",
+                                "State",
                                 style: TextStyle(
                                     fontWeight: FontWeight.w400,
                                     fontSize: 15,
