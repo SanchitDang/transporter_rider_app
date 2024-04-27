@@ -2,6 +2,9 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -10,6 +13,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:transporter_rider_app/config/maps_api_key.dart';
 import 'package:transporter_rider_app/features/uber_auth_feature/domain/use_cases/uber_auth_get_user_uid_usecase.dart';
 import 'package:transporter_rider_app/features/uber_map_feature/data/models/generate_trip_model.dart';
 import 'package:transporter_rider_app/features/uber_map_feature/domain/entities/uber_map_direction_entity.dart';
@@ -139,6 +143,43 @@ class UberMapController extends GetxController {
       }
     }
   }
+
+  setSourcePlaceAndGetLocationDeatailsAndDirection(double latitude, double longitude) async {
+      availableDriversList.clear();
+      sourcePlaceName.value = await getAddressFromCoordinates(latitude, longitude);
+
+      sourceLatitude.value = latitude;
+      sourceLongitude.value = longitude;
+      addMarkers(
+          latitude,
+          longitude,
+          "source_marker",
+          BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+          "default",
+          "Source Location");
+      animateCamera(latitude, longitude);
+  }
+
+  static Future<String> getAddressFromCoordinates(double latitude, double longitude) async {
+    String apiUrl = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=$apiKey';
+
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+      if (response.statusCode == 200) {
+        final decoded = json.decode(response.body);
+        if (decoded['status'] == 'OK') {
+          return decoded['results'][0]['formatted_address'];
+        } else {
+          return 'Error: ${decoded['status']}';
+        }
+      } else {
+        return 'Error: ${response.statusCode}';
+      }
+    } catch (e) {
+      return 'Error: $e';
+    }
+  }
+
 
   getDirection() async {
     availableDriversList.clear();

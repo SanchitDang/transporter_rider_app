@@ -139,7 +139,6 @@ class _MapWithSourceDestinationFieldState
                           await Geolocator.getCurrentPosition(
                               desiredAccuracy: LocationAccuracy.high)
                               .then((Position position) async {
-                            //   location_controller.changePosition(position, controller, context);
                             GoogleMapController controller = await _uberMapController.controller.future;
                             controller.animateCamera(
                               CameraUpdate.newCameraPosition(
@@ -149,6 +148,9 @@ class _MapWithSourceDestinationFieldState
                                 ),
                               ),
                             );
+                            // set them as source loc
+                            _uberMapController
+                                .setSourcePlaceAndGetLocationDeatailsAndDirection(position.latitude, position.longitude);
                           }).catchError((e) {
                             print(e);
                           });
