@@ -12,6 +12,7 @@ import 'package:transporter_rider_app/config/constants.dart';
 import 'package:transporter_rider_app/features/uber_home_page_feature/presentation/getx/uber_home_controller.dart';
 import 'package:transporter_rider_app/features/uber_home_page_feature/presentation/pages/uber_home_page.dart';
 import 'package:transporter_rider_app/features/uber_map_feature/presentation/getx/uber_map_controller.dart';
+import 'package:transporter_rider_app/features/uber_map_feature/presentation/pages/add_details.dart';
 import 'package:transporter_rider_app/features/uber_map_feature/presentation/widgets/map_confirmation_bottomsheet.dart';
 import 'package:transporter_rider_app/injection_container.dart' as di;
 
@@ -20,6 +21,8 @@ import 'package:http/http.dart' as http;
 
 import '../../../../config/maps_api_key.dart';
 import '../../../uber_profile_feature/presentation/getx/uber_profile_controller.dart';
+import '../getx/details_controller.dart';
+import '../getx/trip_controller.dart';
 import '../widgets/WarehouseDialog.dart';
 
 class MapWithSourceDestinationField extends StatefulWidget {
@@ -43,8 +46,11 @@ class _MapWithSourceDestinationFieldState
   final UberProfileController _uberProfileController =
   Get.put(di.sl<UberProfileController>());
 
+  TripController tc = Get.put(TripController());
+
   final sourcePlaceController = TextEditingController();
   final destinationController = TextEditingController();
+  final numberOfGoodsController = TextEditingController();
 
   final UberMapController _uberMapController =
       Get.put(di.sl<UberMapController>());
@@ -183,6 +189,56 @@ class _MapWithSourceDestinationFieldState
                                   FontAwesomeIcons.arrowLeft,
                                 ),
                               ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                              children: [
+                                Container(
+                                  width: MediaQuery.of(context).size.width * .55,
+                                  margin:
+                                  const EdgeInsets.symmetric(horizontal: 15),
+                                  padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                                  decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius:
+                                      BorderRadius.all(Radius.circular(12))),
+                                  child: TextField(
+                                    keyboardType: TextInputType.number,
+                                    onChanged: (val) {
+                                      tc.setNumberOfGoods(int.parse(numberOfGoodsController.text));
+                                    },
+                                    decoration: const InputDecoration(
+                                      hintText: "Enter Number Of Goods",
+                                      border: InputBorder.none,
+                                    ),
+                                    controller: numberOfGoodsController,
+                                  ),
+                                ),
+                                ElevatedButton(
+                                  style: ButtonStyle(
+                                      backgroundColor:
+                                      MaterialStateProperty.all(primaryColor),
+                                      elevation: MaterialStateProperty.all(0.0),
+                                      padding:
+                                      MaterialStateProperty.all(const EdgeInsets.all(10)),
+                                      shape: MaterialStateProperty.all(
+                                        RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(15.0), // Adjust the value as needed
+                                        ),)
+                                  ),
+                                  onPressed: () async {
+                                    Get.put(DetailsController());
+                                    Get.to(const AddDetailsPage());
+                                  },
+                                  child: const Text(
+                                    "Add details",
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                              ],
                             ),
                             const SizedBox(
                               height: 10,
@@ -480,9 +536,9 @@ class FunctionalButton extends StatelessWidget {
           splashColor: Colors.black,
           fillColor: Colors.white,
           elevation: 15.0,
-          shape: CircleBorder(),
+          shape: const CircleBorder(),
           child: Padding(
-              padding: EdgeInsets.all(14.0),
+              padding: const EdgeInsets.all(14.0),
               child: Icon(
                 icon,
                 size: 30.0,

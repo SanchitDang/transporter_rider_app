@@ -118,7 +118,7 @@ class UberMapDataSourceImpl extends UberMapDataSource {
       'trip_amount': generateTripModel.tripAmount,
       'is_arrived': generateTripModel.isArrived,
       'is_payment_done': generateTripModel.isPaymentDone,
-      //for our flow / our fields
+      //todo:: add more points below if needed ""for our flow / our fields""
       'warehouse_source_location': const GeoPoint(0.0, 0.0),
       'sending_warehouse_source': false,
       'reached_warehouse_source': false,
@@ -128,6 +128,7 @@ class UberMapDataSourceImpl extends UberMapDataSource {
       'delivered': false,
       'is_from_admin': false,
       'is_cod': false,
+      'number_of_goods': tc.getNumberOfGoods(),
     });
 
     //find nearest warehouse enar source location so that driver can drop there
