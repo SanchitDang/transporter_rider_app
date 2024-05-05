@@ -19,6 +19,8 @@ class GenerateTripModel extends Equatable {
   final bool? isPaymentDone;
   final String? tripId;
   final int? number_of_goods;
+  final List<Map<String, dynamic>> goods_info;
+  // also add in uber_man_data_source_impl
 
   const GenerateTripModel(
       this.source,
@@ -38,6 +40,7 @@ class GenerateTripModel extends Equatable {
       this.isPaymentDone,
       this.tripId,
       this.number_of_goods,
+      this.goods_info,
       );
 
   @override
@@ -59,6 +62,7 @@ class GenerateTripModel extends Equatable {
         isArrived,
         isPaymentDone,
         tripId,
-        number_of_goods
+        number_of_goods,
+        goods_info
       ];
 }

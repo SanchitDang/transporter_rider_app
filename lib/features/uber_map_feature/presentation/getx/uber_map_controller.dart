@@ -26,6 +26,7 @@ import 'package:transporter_rider_app/features/uber_map_feature/domain/use_cases
 import 'package:transporter_rider_app/features/uber_map_feature/domain/use_cases/uber_map_get_drivers_usecase.dart';
 import 'package:transporter_rider_app/features/uber_map_feature/domain/use_cases/uber_map_prediction_usecase.dart';
 import 'package:transporter_rider_app/features/uber_map_feature/domain/use_cases/vehicle_details_usecase.dart';
+import 'package:transporter_rider_app/features/uber_map_feature/presentation/getx/details_controller.dart';
 import 'package:transporter_rider_app/features/uber_map_feature/presentation/getx/trip_controller.dart';
 import 'package:transporter_rider_app/features/uber_trips_history_feature/presentation/pages/uber_trips_history_page.dart';
 import 'package:uuid/uuid.dart';
@@ -307,7 +308,7 @@ class UberMapController extends GetxController {
   }
 
   generateTrip(UberDriverEntity driverData, int index) async {
-    TripController tc = Get.put(TripController());
+    DetailsController dc = Get.find();
     uberCancelTripUseCase.call(prevTripId.value, true); // if canceled
     subscription.pause();
     String vehicleType = driverData.vehicle!.path.split('/').first;
@@ -340,7 +341,8 @@ class UberMapController extends GetxController {
         false,
         false,
         tripId,
-        tc.getNumberOfGoods()
+        dc.getNumberOfGoods(),
+        dc.getAllGoodsDetails()// todo here put the map of Goods DetailsController
     );
     Stream reqStatusData = uberMapGenerateTripUseCase.call(generateTripModel);
     findDriverLoading.value = true;
@@ -430,7 +432,7 @@ class UberMapController extends GetxController {
   }
 
   generateCustomTrip() async {
-    TripController tc = Get.put(TripController());
+    DetailsController dc = Get.find();
 
     uberCancelTripUseCase.call(prevTripId.value, true); // if canceled
     subscription.pause();
@@ -458,7 +460,8 @@ class UberMapController extends GetxController {
         true,
         false,
         tripId,
-        tc.getNumberOfGoods()
+        dc.getNumberOfGoods(),
+        dc.getAllGoodsDetails()// todo here put the map of Goods DetailsController
     );
     Stream reqStatusData = uberMapGenerateTripUseCase.call(generateTripModel);
     findDriverLoading.value = true;

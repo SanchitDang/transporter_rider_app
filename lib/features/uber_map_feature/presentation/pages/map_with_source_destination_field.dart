@@ -50,7 +50,14 @@ class _MapWithSourceDestinationFieldState
 
   final sourcePlaceController = TextEditingController();
   final destinationController = TextEditingController();
-  final numberOfGoodsController = TextEditingController();
+
+  // todo: get from admin panel
+  final List<Map<String, dynamic>> items = [
+    {'name': 'Item 1', 'price': 10},
+    {'name': 'Item 2', 'price': 20},
+    {'name': 'Item 3', 'price': 30},
+  ];
+  String selectedItem = '';
 
   final UberMapController _uberMapController =
       Get.put(di.sl<UberMapController>());
@@ -205,17 +212,26 @@ class _MapWithSourceDestinationFieldState
                                       color: Colors.white,
                                       borderRadius:
                                       BorderRadius.all(Radius.circular(12))),
-                                  child: TextField(
-                                    keyboardType: TextInputType.number,
-                                    onChanged: (val) {
-                                      tc.setNumberOfGoods(int.parse(numberOfGoodsController.text));
+                                  child: DropdownButton(
+                                    isExpanded: true,
+                                    hint: Text('Select an item'),
+                                    underline: SizedBox(), // Hides the underline
+                                    icon: Icon(Icons.arrow_drop_down), // Moves the dropdown arrow to the right
+                                    iconSize: 24, // Adjust the size of the icon as needed
+                                    iconEnabledColor: primaryColor, // Change the color of the icon as needed
+                                    value: selectedItem.isEmpty ? null : selectedItem,
+                                    onChanged: (String? value) {
+                                      setState(() {
+                                        selectedItem = value!;
+                                      });
                                     },
-                                    decoration: const InputDecoration(
-                                      hintText: "Enter Number Of Goods",
-                                      border: InputBorder.none,
-                                    ),
-                                    controller: numberOfGoodsController,
-                                  ),
+                                    items: items.map<DropdownMenuItem<String>>((Map<String, dynamic> item) {
+                                      return DropdownMenuItem<String>(
+                                        value: item['name'],
+                                        child: Text('${item['name']} - \$${item['price']}'),
+                                      );
+                                    }).toList(),
+                                  )
                                 ),
                                 ElevatedButton(
                                   style: ButtonStyle(

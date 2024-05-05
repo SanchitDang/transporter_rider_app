@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:transporter_rider_app/config/constants.dart';
 import 'package:transporter_rider_app/features/uber_map_feature/presentation/getx/details_controller.dart';
 
 import '../getx/trip_controller.dart';
@@ -19,6 +20,11 @@ class _AddDetailsPageState extends State<AddDetailsPage> {
     DetailsController controller = Get.find();
     TripController tc = Get.find();
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Add Good Details"),
+        centerTitle: true,
+        backgroundColor: primaryColor,
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -37,39 +43,58 @@ class _AddDetailsPageState extends State<AddDetailsPage> {
                     return Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 10, 0, 5),
-                          child: Text("Good: ${index + 1}"),
+                          padding: const EdgeInsets.fromLTRB(20, 10, 20, 5),
+                          child: Row(
+                            children: [
+                              Text("Good: ${index + 1}", style: const TextStyle(
+                              fontWeight: FontWeight.w700, fontSize: 18),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                              const Spacer(),
+                              ElevatedButton(
+                                style: ButtonStyle(
+                                    backgroundColor:
+                                    MaterialStateProperty.all(primaryColor),
+                                    shape: MaterialStateProperty.all(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            15.0), // Adjust the value as needed
+                                      ),
+                                    )),
+                                onPressed: () async {
+                                  await controller.pickImage(index);
+                                  setState(() {});
+                                },
+                                child: const Text('Add Image', style: TextStyle(
+                                     fontSize: 14),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        Builder(
-                          builder: (BuildContext context) {
-                            final file = File(imageFilePath);
-                            if (file.existsSync()) {
-                              return Image.file(
-                                file,
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover,
-                              );
-                            } else {
-                              return const Text(
-                                'No image selected',
-                                style: TextStyle(color: Colors.red), // Adjust styling as needed
-                              );
-                            }
-                          },
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            controller.pickImage(
-                                index);
-                            Future.delayed(Duration(seconds: 2), () {
-                              setState(() {
-
-                              });
-                            });
-
-                          },
-                          child: const Text('Add Image'),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Builder(
+                            builder: (BuildContext context) {
+                              final file = File(imageFilePath);
+                              if (file.existsSync()) {
+                                return Image.file(
+                                  file,
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                );
+                              } else {
+                                return const Text(
+                                  'No image selected',
+                                  style: TextStyle(
+                                      color:
+                                          Colors.red), // Adjust styling as needed
+                                );
+                              }
+                            },
+                          ),
                         ),
                         Container(
                           margin: const EdgeInsets.symmetric(horizontal: 15),
@@ -113,35 +138,50 @@ class _AddDetailsPageState extends State<AddDetailsPage> {
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Obx(() =>
-                      Text("Max no. Of Goods: ${tc.getNumberOfGoods()}")),
-                  Row(
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          if(tc.getNumberOfGoods() > controller.getNumberOfGoods()){
-                            controller.addGood();
-                          }else {
-                            Get.snackbar("Oops!", "Max number of goods added");
-                          }
-                        },
-                        child: const Text('Add Good'),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          controller.done();
-                          setState(() {
+                  const Spacer(),
+                  ElevatedButton(
+                    style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(primaryColor),
+                        elevation: MaterialStateProperty.all(0.0),
+                        padding: MaterialStateProperty.all(
+                            const EdgeInsets.all(10)),
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                                15.0), // Adjust the value as needed
+                          ),
+                        )),
+                    onPressed: () {
 
-                          });
-                        },
-                        child: const Text('Done'),
-                      ),
-                    ],
+                        controller.addGood();
+                        Get.snackbar("Awesome!", "Good Added.");
+
+                    },
+                    child: const Text('Add Good'),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  ElevatedButton(
+                    style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(primaryColor),
+                        elevation: MaterialStateProperty.all(0.0),
+                        padding: MaterialStateProperty.all(
+                            const EdgeInsets.all(10)),
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                                15.0), // Adjust the value as needed
+                          ),
+                        )),
+                    onPressed: () {
+                      controller.done();
+                      setState(() {});
+                    },
+                    child: const Text('Done'),
                   ),
                 ],
               ),

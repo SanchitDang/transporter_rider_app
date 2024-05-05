@@ -15,6 +15,8 @@ import 'package:transporter_rider_app/features/uber_map_feature/data/models/uber
 import 'package:transporter_rider_app/features/uber_map_feature/data/models/vehicle_details_model.dart';
 import 'package:transporter_rider_app/features/uber_map_feature/presentation/getx/trip_controller.dart';
 
+import '../../presentation/getx/details_controller.dart';
+
 class UberMapDataSourceImpl extends UberMapDataSource {
   final http.Client client;
   final FirebaseAuth auth;
@@ -98,6 +100,7 @@ class UberMapDataSourceImpl extends UberMapDataSource {
   Stream generateTrip(GenerateTripModel generateTripModel) {
     TripController tc = Get.put(TripController());
     tc.setCurrentTripId(generateTripModel.tripId ?? "");
+    DetailsController dc = Get.find();
 
     final genarateTripCollection = firestore.collection("trips");
     genarateTripCollection.doc(generateTripModel.tripId).set({
@@ -128,7 +131,8 @@ class UberMapDataSourceImpl extends UberMapDataSource {
       'delivered': false,
       'is_from_admin': false,
       'is_cod': false,
-      'number_of_goods': tc.getNumberOfGoods(),
+      'number_of_goods': dc.getNumberOfGoods(),
+      'goods_info': dc.getAllGoodsDetails()
     });
 
     //find nearest warehouse enar source location so that driver can drop there
