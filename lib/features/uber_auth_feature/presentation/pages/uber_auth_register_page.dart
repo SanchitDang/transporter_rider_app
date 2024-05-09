@@ -171,8 +171,8 @@ Widget buildStaticRegisterPageBody(
         height: 10,
       ),
       TextFieldWidget(
-        labelText: 'City',
-        textType: 'Enter your city',
+        labelText: 'State',
+        textType: 'Enter your State',
         inputType: TextInputType.streetAddress,
         controller: city,
       ),

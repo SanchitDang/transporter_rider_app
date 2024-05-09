@@ -76,7 +76,7 @@ class _UberHomePageState extends State<UberHomePage> {
                 },
                 child: UberHomeWhereToWidget(),
               ),
-              //todo:: choose saved place
+              // uncomment to get back choose saved place
               // ListTile(
               //   leading: Container(
               //     padding: const EdgeInsets.all(10),

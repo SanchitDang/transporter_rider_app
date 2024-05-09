@@ -15,7 +15,9 @@ import 'package:transporter_rider_app/features/uber_map_feature/data/models/uber
 import 'package:transporter_rider_app/features/uber_map_feature/data/models/vehicle_details_model.dart';
 import 'package:transporter_rider_app/features/uber_map_feature/presentation/getx/trip_controller.dart';
 
+import '../../../uber_profile_feature/presentation/getx/uber_profile_controller.dart';
 import '../../presentation/getx/details_controller.dart';
+import 'package:transporter_rider_app/injection_container.dart' as di;
 
 class UberMapDataSourceImpl extends UberMapDataSource {
   final http.Client client;
@@ -26,11 +28,9 @@ class UberMapDataSourceImpl extends UberMapDataSource {
   UberMapDataSourceImpl(
       {required this.auth, required this.firestore, required this.client});
 
-  //todo, add from admin panel
-  List<Map<String, dynamic>> places = [
-    {'name': "XYZ WareHouse", 'latitude': 28.63873688409748, 'longitude': 77.11972520423109},
-    {'name': "PQR WareHouse", 'latitude': 28.64476311801263, 'longitude': 77.1268920666985},
-  ];
+
+  // warehouses will be added from admin panel
+  List<Map<String, dynamic>> places = []; // {'name': "XYZ WareHouse", 'latitude': 28.63873688409748, 'longitude': 77.11972520423109},
 
   @override
   Future<PredictionsList> getUberMapPrediction(String placeName) async {
@@ -83,12 +83,19 @@ class UberMapDataSourceImpl extends UberMapDataSource {
 
   @override
   Future<RentalChargeModel> getRentalChargeForVehicle(double kms) async {
-    final pricesCollection = firestore.collection("prices");
-    DocumentSnapshot charges = await pricesCollection.doc("vehicles").get();
-    //fetch per km charge from prices collection and multiply by kms
-    final double rickShawRent = kms * charges.get("auto_rickshaw");
-    final double carRent = kms * charges.get("car");
-    final double bikeRent = kms * charges.get("bike");
+    // final pricesCollection = firestore.collection("prices");
+    // DocumentSnapshot charges = await pricesCollection.doc("vehicles").get();
+    // //fetch per km charge from prices collection and multiply by kms
+    // final double rickShawRent = kms * charges.get("auto_rickshaw");
+    // final double carRent = kms * charges.get("car");
+    // final double bikeRent = kms * charges.get("bike");
+
+    //**getting price from selected category rather than from price
+    TripController tc = Get.find();
+    int pricee =  tc.getPrice();
+    final double rickShawRent = kms * pricee;
+    final double carRent = kms * pricee;
+    final double bikeRent = kms * pricee;
 
     final vehicleRent = RentalChargeModel(
         auto_rickshaw: rickShawRent, car: carRent, bike: bikeRent);
@@ -97,7 +104,7 @@ class UberMapDataSourceImpl extends UberMapDataSource {
   }
 
   @override
-  Stream generateTrip(GenerateTripModel generateTripModel) {
+  Stream generateTrip(GenerateTripModel generateTripModel) async* {
     TripController tc = Get.put(TripController());
     tc.setCurrentTripId(generateTripModel.tripId ?? "");
     DetailsController dc = Get.find();
@@ -135,22 +142,39 @@ class UberMapDataSourceImpl extends UberMapDataSource {
       'goods_info': dc.getAllGoodsDetails()
     });
 
-    //find nearest warehouse enar source location so that driver can drop there
-    findNearestPlace(generateTripModel, places).then((nearestPlace) {
+    final UberProfileController _uberProfileController =
+    Get.put(di.sl<UberProfileController>());
+    String state = _uberProfileController
+        .riderData
+        .value['city']
+        .toString().capitalizeFirst!;
 
-      GeoPoint nearestPlaceGeoPoint = const GeoPoint(0.0, 0.0);
-      nearestPlaceGeoPoint = GeoPoint(nearestPlace['latitude'], nearestPlace['longitude']);
+    try {
+      List<Map<String, dynamic>> warehouses = await getWarehousesForState(state);
+      warehouses.forEach((warehouse) {
+        print("nearby warehouses in $state ------------->");
+        print('Name: ${warehouse['name']}, Latitude: ${warehouse['latitude']}, Longitude: ${warehouse['longitude']}');
+      });
 
-      final genarateTripCollection = firestore.collection("trips");
-      genarateTripCollection.doc(generateTripModel.tripId).set({
-        'warehouse_source_location': nearestPlaceGeoPoint,
-      },
-          SetOptions(merge: true)
-      );
+      //find nearest warehouse enar source location so that driver can drop there
+      findNearestPlace(generateTripModel, warehouses).then((nearestPlace) {
 
-    });
+        GeoPoint nearestPlaceGeoPoint = const GeoPoint(0.0, 0.0);
+        nearestPlaceGeoPoint = GeoPoint(nearestPlace['latitude'], nearestPlace['longitude']);
 
-    return genarateTripCollection.doc(generateTripModel.tripId).snapshots();
+        final genarateTripCollection = firestore.collection("trips");
+        genarateTripCollection.doc(generateTripModel.tripId).set({
+          'warehouse_source_location': nearestPlaceGeoPoint,
+        },
+            SetOptions(merge: true)
+        );
+
+      });
+    } catch (e) {
+      print('Failed to fetch warehouses: $e');
+    }
+
+    yield genarateTripCollection.doc(generateTripModel.tripId).snapshots();
   }
 
   @override
@@ -276,6 +300,26 @@ class UberMapDataSourceImpl extends UberMapDataSource {
     return nearestPlace ?? {}; // Return an empty map if no nearest place found
   }
 
+  Future<List<Map<String, dynamic>>> getWarehousesForState(String state) async {
+    final CollectionReference _warehousesCollection =
+    FirebaseFirestore.instance.collection('warehouses');
+
+    QuerySnapshot warehouseSnapshot = await _warehousesCollection
+        .doc('state')
+        .collection(state)
+        .get();
+
+    List<Map<String, dynamic>> places = [];
+    warehouseSnapshot.docs.forEach((doc) {
+      places.add({
+        'name': doc['name'],
+        'latitude': doc['lat'],
+        'longitude': doc['lng'],
+      });
+    });
+
+    return places;
+  }
 }
 
 

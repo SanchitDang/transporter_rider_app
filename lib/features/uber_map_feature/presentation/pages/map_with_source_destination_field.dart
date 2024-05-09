@@ -9,7 +9,6 @@ import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:transporter_rider_app/config/constants.dart';
-import 'package:transporter_rider_app/features/uber_home_page_feature/presentation/getx/uber_home_controller.dart';
 import 'package:transporter_rider_app/features/uber_home_page_feature/presentation/pages/uber_home_page.dart';
 import 'package:transporter_rider_app/features/uber_map_feature/presentation/getx/uber_map_controller.dart';
 import 'package:transporter_rider_app/features/uber_map_feature/presentation/pages/add_details.dart';
@@ -51,13 +50,9 @@ class _MapWithSourceDestinationFieldState
   final sourcePlaceController = TextEditingController();
   final destinationController = TextEditingController();
 
-  // todo: get from admin panel
-  final List<Map<String, dynamic>> items = [
-    {'name': 'Item 1', 'price': 10},
-    {'name': 'Item 2', 'price': 20},
-    {'name': 'Item 3', 'price': 30},
-  ];
+  final List<Map<String, dynamic>> items = []; //    {'name': 'Item 1', 'price': 10},
   String selectedItem = '';
+  int selectedPrice = 1;
 
   final UberMapController _uberMapController =
       Get.put(di.sl<UberMapController>());
@@ -65,7 +60,20 @@ class _MapWithSourceDestinationFieldState
   @override
   void initState() {
     super.initState();
+    Get.put(DetailsController());
     _uberProfileController.getRiderProfile();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    try {
+      List<Map<String, dynamic>> fetchedItems = await getItemsFromFirestore();
+      setState(() {
+        items.addAll(fetchedItems);
+      });
+    } catch (e) {
+      print('Failed to fetch items: $e');
+    }
   }
 
   @override
@@ -223,6 +231,9 @@ class _MapWithSourceDestinationFieldState
                                     onChanged: (String? value) {
                                       setState(() {
                                         selectedItem = value!;
+                                        // Update selectedPrice based on the selected item
+                                        selectedPrice = items.firstWhere((item) => item['name'] == value)['price'];
+                                        tc.setPrice(selectedPrice);
                                       });
                                     },
                                     items: items.map<DropdownMenuItem<String>>((Map<String, dynamic> item) {
@@ -246,7 +257,6 @@ class _MapWithSourceDestinationFieldState
                                         ),)
                                   ),
                                   onPressed: () async {
-                                    Get.put(DetailsController());
                                     Get.to(const AddDetailsPage());
                                   },
                                   child: const Text(
@@ -401,6 +411,10 @@ class _MapWithSourceDestinationFieldState
                                 .toString().capitalizeFirst!;
 
                             try {
+                              // List<Map<String, dynamic>> warehouse = [
+                              //   {'name': "XYZ WareHouse", 'latitude': 28.63873688409748, 'longitude': 77.11972520423109},
+                              //   {'name': "PQR WareHouse", 'latitude': 28.64476311801263, 'longitude': 77.1268920666985},
+                              // ];
                               List<Map<String, dynamic>> warehouses = await getWarehousesForState(state);
                               warehouses.forEach((warehouse) {
                                 print("nearby warehouses in $state ------------->");
@@ -410,16 +424,6 @@ class _MapWithSourceDestinationFieldState
                             } catch (e) {
                               print('Failed to fetch warehouses: $e');
                             }
-
-                            // //todo, add from admin panel (done --> above <---)
-                            // List<Map<String, dynamic>> places = [
-                            //   {'name': "XYZ WareHouse", 'latitude': 28.63873688409748, 'longitude': 77.11972520423109},
-                            //   {'name': "PQR WareHouse", 'latitude': 28.64476311801263, 'longitude': 77.1268920666985},
-                            // ];
-                            //
-                            // //find nearest warehouse enar source location so that driver can drop there
-                            // findNearestPlace(places);
-
                           },
                           child: const Text(
                             "Drop on your Own",
@@ -445,9 +449,9 @@ class _MapWithSourceDestinationFieldState
                     mainAxisAlignment: MainAxisAlignment.center,
                     //crossAxisAlignment: CrossAxisAlignment.center,
                     children: const [
-                      CircularProgressIndicator(
-                        color: Colors.black,
-                      ),
+                      // CircularProgressIndicator(
+                      //   color: Colors.black,
+                      // ),
                       Text(
                         "  Loading Rides....",
                         style: TextStyle(fontWeight: FontWeight.w600),
@@ -463,10 +467,10 @@ class _MapWithSourceDestinationFieldState
     );
   }
 
-  final CollectionReference _warehousesCollection =
-  FirebaseFirestore.instance.collection('warehouses');
-
   Future<List<Map<String, dynamic>>> getWarehousesForState(String state) async {
+    final CollectionReference _warehousesCollection =
+    FirebaseFirestore.instance.collection('warehouses');
+
     QuerySnapshot warehouseSnapshot = await _warehousesCollection
         .doc('state')
         .collection(state)
@@ -527,6 +531,34 @@ class _MapWithSourceDestinationFieldState
     }
 
     return nearestPlace ?? {}; // Return an empty map if no nearest place found
+  }
+
+  Future<List<Map<String, dynamic>>> getItemsFromFirestore() async {
+    final CollectionReference _pricesCollection =
+    FirebaseFirestore.instance.collection('prices');
+
+    try {
+      QuerySnapshot querySnapshot = await _pricesCollection.get();
+
+      List<Map<String, dynamic>> items = [];
+      for (QueryDocumentSnapshot categoryDoc in querySnapshot.docs) {
+        QuerySnapshot subCategorySnapshot =
+        await categoryDoc.reference.collection('categories').get();
+        for (QueryDocumentSnapshot subCategoryDoc in subCategorySnapshot.docs) {
+          if (subCategoryDoc.exists) {
+            items.add({
+              'name': subCategoryDoc['name'],
+              'price': subCategoryDoc['price'],
+            });
+          }
+        }
+      }
+
+      return items;
+    } catch (e) {
+      print('Error fetching items: $e');
+      return [];
+    }
   }
 
 }

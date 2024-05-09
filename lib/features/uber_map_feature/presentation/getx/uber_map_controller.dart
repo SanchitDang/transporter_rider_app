@@ -204,12 +204,17 @@ class UberMapController extends GetxController {
         markers.removeRange(2, markers.length - 1);
       }
       for (int i = 0; i < driverData.length; i++) {
-        if (Geolocator.distanceBetween(
-                sourceLatitude.value,
-                sourceLongitude.value,
-                driverData[i].currentLocation!.latitude,
-                driverData[i].currentLocation!.longitude) <
-            5000) {
+        if (true)
+
+          //todo:: remove below comment to check distance between driver and pickup location
+        // (Geolocator.distanceBetween(
+        //         sourceLatitude.value,
+        //         sourceLongitude.value,
+        //         driverData[i].currentLocation!.latitude,
+        //         driverData[i].currentLocation!.longitude) <
+        //     5000)
+
+        {
           availableDriversList.add(driverData[i]);
           addMarkers(
               driverData[i].currentLocation!.latitude,
